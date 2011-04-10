@@ -1,5 +1,5 @@
-#ifndef __ICMP_H__
-#define __ICMP_H__
+#ifndef __UDP_H__
+#define __UDP_H__
 
 #include <libnet.h>
 #include <iostream>
@@ -20,17 +20,17 @@ typedef struct argList{
 
 } argList;
 
-class icmp 
+class udp
 {
 private:
     int packet_size;                    /* packet size*/
-    int network;
+    libnet_t *network;                  /* network pointer*/
     
     u_char payload[MAX_PAYLOAD_SZ];     /* packet payload*/
-    u_char *packet;                     /* pointer to packet buffer*/
     char err_buf[LIBNET_ERRBUF_SIZE];   /* error buffer*/
-    struct libnet_plist_chain plist;    /* plist chain*/
-    struct libnet_plist_chain *plist_p; /* plist chain pointer*/
+
+    u_char *ip_opt;
+    int opt_len;
 
     argList packetArgs;
     u_short cport;                      /* current dst port*/
@@ -39,8 +39,12 @@ private:
     u_int ifInitArgs;
 
 public:
-    icmp():ifInitPayload(0), ifInitArgs(0){};
-    ~icmp(){};
+    udp():ip_opt(NULL), ifInitPayload(0), ifInitArgs(0) {};
+    ~udp()
+    { 
+        if (ip_opt != NULL) 
+            delete []ip_opt;
+    };
 
 public:
     int setPayload(u_char *aPayload, int len = -1)
@@ -50,22 +54,36 @@ public:
 
         memset(payload, 0, MAX_PAYLOAD_SZ);
         memcpy(payload, aPayload, len);
-        packetArgs.packet_size = len;
+        packetArgs.payload_size= len;
 
         ifInitPayload = 1;
 
         return 0;
     };
+    int setIPOpt(u_char *aOpt, int len = -1)
+    {
+        if (len < 0)
+        {
+            ip_opt = NULL;
+            return -1;
+        }
+
+        ip_opt = new u_char[len];
+        memcpy(ip_opt, aOpt, len);
+        opt_len = len;
+
+        return 0;
+    }
     void setArgs(u_int fragm, u_int ttl, 
                  u_long srcIP, u_long dstIP,
                  u_short srcPort, u_short dstPortb, u_short dstPorte)
     {
         setFragmentation(fragm);
-        setTTl(ttl);
+        setTTL(ttl);
         setSrcIP(srcIP);
         setDstIP(dstIP);
         setSrcPort(srcPort);
-        setDstPortRange(dstPortb, dstPorte);
+        setDstPort(dstPortb, dstPorte);
 
         ifInitArgs = 1;
     };
@@ -81,13 +99,13 @@ private:
     
 
 private:
-    int memoryInit();      //step 1
-    int networkInit();     //step 2
-    int packetConstrIP();  //step 3
-    int packetConstrICMP(); //step 3.5 
-    int packetChecksum();  //step 4
-    int packetInject();    //step 5
-    int memoryDeinit();    //step 6
+    int networkInit();          //step 1
+    int packetConstrUDP();      //step 2 
+    int packetConstrIPOpt();    //step 2.5
+    int packetConstrIP();       //step 3
+    int packetInject();         //step 4
+    int packetStat();           //step 4.5
+    int memoryDeinit();         //step 5
         
     
 };

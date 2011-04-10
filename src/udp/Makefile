@@ -4,5 +4,5 @@ INCLUDE= -I/opt/local/include
 LIB= -L/opt/local/lib
 
 test: main.cpp udp.cpp
-	gcc -Wall $(DEFINES) $(INCLUDE) $(LIB) $(LIBS) -o test main.cpp udp.cpp 
+	g++ -Wall $(DEFINES) $(INCLUDE) $(LIB) $(LIBS) -o test main.cpp udp.cpp 
 

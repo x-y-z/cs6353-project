@@ -24,13 +24,13 @@ class udp
 {
 private:
     int packet_size;                    /* packet size*/
-    int network;
+    libnet_t *network;                  /* network pointer*/
     
     u_char payload[MAX_PAYLOAD_SZ];     /* packet payload*/
-    u_char *packet;                     /* pointer to packet buffer*/
     char err_buf[LIBNET_ERRBUF_SIZE];   /* error buffer*/
-    struct libnet_plist_chain plist;    /* plist chain*/
-    struct libnet_plist_chain *plist_p; /* plist chain pointer*/
+
+    u_char *ip_opt;
+    int opt_len;
 
     argList packetArgs;
     u_short cport;                      /* current dst port*/
@@ -39,8 +39,12 @@ private:
     u_int ifInitArgs;
 
 public:
-    udp():ifInitPayload(0), ifInitArgs(0){};
-    ~udp(){};
+    udp():ip_opt(NULL), ifInitPayload(0), ifInitArgs(0) {};
+    ~udp()
+    { 
+        if (ip_opt != NULL) 
+            delete []ip_opt;
+    };
 
 public:
     int setPayload(u_char *aPayload, int len = -1)
@@ -56,6 +60,20 @@ public:
 
         return 0;
     };
+    int setIPOpt(u_char *aOpt, int len = -1)
+    {
+        if (len < 0)
+        {
+            ip_opt = NULL;
+            return -1;
+        }
+
+        ip_opt = new u_char[len];
+        memcpy(ip_opt, aOpt, len);
+        opt_len = len;
+
+        return 0;
+    }
     void setArgs(u_int fragm, u_int ttl, 
                  u_long srcIP, u_long dstIP,
                  u_short srcPort, u_short dstPortb, u_short dstPorte)
@@ -81,13 +99,13 @@ private:
     
 
 private:
-    int memoryInit();      //step 1
-    int networkInit();     //step 2
-    int packetConstrIP();  //step 3
-    int packetConstrUDP(); //step 3.5 
-    int packetChecksum();  //step 4
-    int packetInject();    //step 5
-    int memoryDeinit();    //step 6
+    int networkInit();          //step 1
+    int packetConstrUDP();      //step 2 
+    int packetConstrIPOpt();    //step 2.5
+    int packetConstrIP();       //step 3
+    int packetInject();         //step 4
+    int packetStat();           //step 4.5
+    int memoryDeinit();         //step 5
         
     
 };

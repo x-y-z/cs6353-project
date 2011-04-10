@@ -26,7 +26,7 @@ private:
     int packet_size;                    /* packet size*/
     libnet_t *network;                  /* network pointer*/
     
-    u_char payload[MAX_PAYLOAD_SZ];     /* packet payload*/
+    char payload[MAX_PAYLOAD_SZ];     /* packet payload*/
     char err_buf[LIBNET_ERRBUF_SIZE];   /* error buffer*/
 
     u_char *ip_opt;
@@ -38,8 +38,15 @@ private:
     u_int ifInitPayload;
     u_int ifInitArgs;
 
+    libnet_ptag_t udp_t;
+    libnet_ptag_t ipo_t;
+    libnet_ptag_t ip_t;
 public:
-    udp():ip_opt(NULL), ifInitPayload(0), ifInitArgs(0) {};
+    udp():ip_opt(NULL), ifInitPayload(0), ifInitArgs(0),
+          udp_t(0), ipo_t(0), ip_t(0)
+    {
+        networkInit();
+    };
     ~udp()
     { 
         if (ip_opt != NULL) 
@@ -47,7 +54,7 @@ public:
     };
 
 public:
-    int setPayload(u_char *aPayload, int len = -1)
+    int setPayload(char *aPayload, int len = -1)
     {
         if (len < 0 || len > MAX_PAYLOAD_SZ)
             return -1;
@@ -75,7 +82,7 @@ public:
         return 0;
     }
     void setArgs(u_int fragm, u_int ttl, 
-                 u_long srcIP, u_long dstIP,
+                 const char *srcIP, const char *dstIP,
                  u_short srcPort, u_short dstPortb, u_short dstPorte)
     {
         setFragmentation(fragm);
@@ -91,8 +98,30 @@ public:
 private:
     void setFragmentation(u_int flag){ packetArgs.frag = flag; };
     void setTTL(u_int flag){ packetArgs.ttl = flag; };
-    void setSrcIP(u_long arg){ packetArgs.src_ip = arg; };
-    void setDstIP(u_long arg){ packetArgs.dst_ip = arg; };
+    void setSrcIP(const char *arg)
+    { 
+        packetArgs.src_ip = libnet_name2addr4(
+                                network, 
+                                const_cast<char *>(arg), 
+                                LIBNET_RESOLVE); 
+        if (packetArgs.src_ip == (u_long)-1)
+        {
+            std::cerr<<"Bad destination IP address: "<<arg<<std::endl;
+            exit(1);
+        }
+    };
+    void setDstIP(const char * arg)
+    { 
+        packetArgs.dst_ip = libnet_name2addr4(
+                                network, 
+                                const_cast<char *>(arg), 
+                                LIBNET_RESOLVE);
+        if (packetArgs.dst_ip == (u_long)-1)
+        {
+            std::cerr<<"Bad destination IP address: "<<arg<<std::endl;
+            exit(1);
+        }
+    };
     void setSrcPort(u_short arg){ packetArgs.src_port = arg; };
     void setDstPort(u_short begin, u_short end)
     { packetArgs.dst_bport = begin; packetArgs.dst_eport = end; };

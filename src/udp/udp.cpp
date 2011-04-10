@@ -3,8 +3,8 @@
 int udp::sendPacket()
 {
     int ret;
-    int bport;
-    int eport;
+    uint16_t bport;
+    uint16_t eport;
 
     bport = packetArgs.dst_bport;
     eport = packetArgs.dst_eport;
@@ -32,7 +32,7 @@ int udp::sendPacket()
     return 0;
 }
 
-int udp::memoryInit();      //step 1
+int udp::memoryInit()      //step 1
 {
     int packet_size = LIBNET_IP_H + LIBNET_UDP_H + packetArgs.payload_size;
 
@@ -45,7 +45,7 @@ int udp::memoryInit();      //step 1
 
 }
 
-int udp::networkInit();     //step 2
+int udp::networkInit()     //step 2
 {
     network = libnet_open_raw_sock(IPPROTO_RAW);
     if (network == -1)
@@ -58,7 +58,7 @@ int udp::networkInit();     //step 2
 
 }
 
-int udp::packetConstrIP();    //step 3
+int udp::packetConstrIP()    //step 3
 {
     libnet_build_ip(LIBNET_UDP_H + packetArgs.payload_size,
                     0,
@@ -75,7 +75,7 @@ int udp::packetConstrIP();    //step 3
     return 0;
 }
 
-int udp::packetConstrUDP(); //step 3.5 
+int udp::packetConstrUDP() //step 3.5 
 {
     libnet_build_udp(packetArgs.src_port,
                      cport,
@@ -87,7 +87,7 @@ int udp::packetConstrUDP(); //step 3.5
 
 }
 
-int udp::packetChecksum();  //step 4
+int udp::packetChecksum()  //step 4
 {
     if (libnet_do_checksum(packet, IPPROTO_UDP, LIBNET_UDP_H) == -1)
     {
@@ -99,7 +99,7 @@ int udp::packetChecksum();  //step 4
 
 }
 
-int udp::packetInject();    //step 5
+int udp::packetInject()    //step 5
 {
     int ret;
 
@@ -119,7 +119,7 @@ int udp::packetInject();    //step 5
 
 }
 
-int udp::memoryDeinit();    //step 6
+int udp::memoryDeinit()    //step 6
 {
     /*
      *  Shut down the interface.

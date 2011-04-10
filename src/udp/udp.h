@@ -50,7 +50,7 @@ public:
 
         memset(payload, 0, MAX_PAYLOAD_SZ);
         memcpy(payload, aPayload, len);
-        packetArgs.packet_size = len;
+        packetArgs.payload_size= len;
 
         ifInitPayload = 1;
 
@@ -61,11 +61,11 @@ public:
                  u_short srcPort, u_short dstPortb, u_short dstPorte)
     {
         setFragmentation(fragm);
-        setTTl(ttl);
+        setTTL(ttl);
         setSrcIP(srcIP);
         setDstIP(dstIP);
         setSrcPort(srcPort);
-        setDstPortRange(dstPortb, dstPorte);
+        setDstPort(dstPortb, dstPorte);
 
         ifInitArgs = 1;
     };

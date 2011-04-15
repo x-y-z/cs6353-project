@@ -6,10 +6,9 @@
   
   <style type="text/css"></style>
 </head><body>
-Please choose which kind of packet you want to send&#129;F<br>
+Please choose which kind of packet you want to send&#65533;F<br>
 
-<form action="http://127.0.0.1:3333" method="post">
-  <input name="type" value="tcp" type="radio">TCP Packet<br>
+<form action="http://127.0.0.1:3333" method="post"> <input name="type" value="tcp" type="radio">TCP Packet<br>
   <input name="type" value="udp" type="radio">UDP Packet<br>
   <input name="type" value="icmp" type="radio">ICMP Packet<br>
   <table style="width: 554px; height: 91px;">
@@ -29,10 +28,55 @@ Please choose which kind of packet you want to send&#129;F<br>
       </tr>
     </tbody>
   </table>
-Payload:
-  <textarea name="payload" cols="50" rows="3"></textarea><br>
-  
-  <input value="Submit" type="submit">
-</form>
+  <br>
+  <table style="text-align: left; width: 100px;" border="1" cellpadding="2" cellspacing="2">
+    <tbody>
+      <tr>
+        <td colspan="2" rowspan="1" style="vertical-align: top;">For TCP<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">seq Number:<input name="seqnum" type="text"></td>
+        <td style="vertical-align: top;">ACK Number:<input name="acknum" type="text"></td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">window Size:<input name="winsz" type="text"></td>
+        <td style="vertical-align: top;">urgent pointer:<input name="urgptr" type="text"></td>
+      </tr>
+      <tr>
+        <td colspan="2" rowspan="1" style="vertical-align: top;">control
+Flags:<br>
+        <input name="ctrlflag" value="urg" type="checkbox">Urgent
+pointer<br>
+        <input name="ctrlflag" value="psh" type="checkbox">Push the data<br>
+        <input name="ctrlflag" value="rst" type="checkbox">Reset
+referenced connection<br>
+        <input name="ctrlflag" value="syn" type="checkbox">Sync
+sequence numbers<br>
+        <input name="ctrlflag" value="fin" type="checkbox">Finished
+sending data<br>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <table style="text-align: left; width: 100px;" border="1" cellpadding="2" cellspacing="2">
+    <tbody>
+      <tr>
+        <td colspan="2" rowspan="1" style="vertical-align: top;">For
+ICMP<br>
+        </td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">Type:<input name="icmptype" type="text"></td>
+        <td style="vertical-align: top;">Code:<input name="icmpcode" type="text"><br>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <br>
+Payload: <textarea name="payload" cols="50" rows="3"></textarea><br>
+  <input value="Submit" type="submit"></form>
 
 </body></html>

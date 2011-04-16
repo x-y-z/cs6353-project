@@ -6,12 +6,12 @@
   
   <style type="text/css"></style>
 </head><body>
-Please choose which kind of packet you want to send&#65533;F<br>
+Please choose which kind of packet you want to send<br>
 
 <form action="http://127.0.0.1:3333" method="post"> <input name="type" value="tcp" type="radio">TCP Packet<br>
   <input name="type" value="udp" type="radio">UDP Packet<br>
   <input name="type" value="icmp" type="radio">ICMP Packet<br>
-  <table style="width: 554px; height: 91px;">
+  <table style="text-align: left; width: 554px;" border="1" cellpadding="2" cellspacing="2">
     <tbody>
       <tr>
         <td>source IP:<input name="srcip" type="text"></td>
@@ -36,29 +36,31 @@ Please choose which kind of packet you want to send&#65533;F<br>
         </td>
       </tr>
       <tr>
-        <td style="vertical-align: top;">seq Number:<input name="seqnum" type="text"></td>
-        <td style="vertical-align: top;">ACK Number:<input name="acknum" type="text"></td>
+        <td style="vertical-align: top;">seq Number:<input name="tcp_seqnum" type="text"></td>
+        <td style="vertical-align: top;">ACK Number:<input name="tcp_acknum" type="text"></td>
       </tr>
       <tr>
-        <td style="vertical-align: top;">window Size:<input name="winsz" type="text"></td>
-        <td style="vertical-align: top;">urgent pointer:<input name="urgptr" type="text"></td>
+        <td style="vertical-align: top;">window Size:<input name="tcp_winsz" type="text"></td>
+        <td style="vertical-align: top;">urgent pointer:<input name="tcp_urgptr" type="text"></td>
       </tr>
       <tr>
         <td colspan="2" rowspan="1" style="vertical-align: top;">control
 Flags:<br>
-        <input name="ctrlflag" value="urg" type="checkbox">Urgent
+        <input name="ctrlflag" value="tcp_urg" type="checkbox">Urgent
 pointer<br>
-        <input name="ctrlflag" value="psh" type="checkbox">Push the data<br>
-        <input name="ctrlflag" value="rst" type="checkbox">Reset
+        <input name="ctrlflag" value="tcp_psh" type="checkbox">Push the
+data<br>
+        <input name="ctrlflag" value="tcp_rst" type="checkbox">Reset
 referenced connection<br>
-        <input name="ctrlflag" value="syn" type="checkbox">Sync
+        <input name="ctrlflag" value="tcp_syn" type="checkbox">Sync
 sequence numbers<br>
-        <input name="ctrlflag" value="fin" type="checkbox">Finished
+        <input name="ctrlflag" value="tcp_fin" type="checkbox">Finished
 sending data<br>
         </td>
       </tr>
     </tbody>
   </table>
+  <br>
   <br>
   <table style="text-align: left; width: 100px;" border="1" cellpadding="2" cellspacing="2">
     <tbody>
@@ -68,13 +70,42 @@ ICMP<br>
         </td>
       </tr>
       <tr>
-        <td style="vertical-align: top;">Type:<input name="icmptype" type="text"></td>
-        <td style="vertical-align: top;">Code:<input name="icmpcode" type="text"><br>
+        <td style="vertical-align: top;">Type:<input name="icmp_type" type="text"></td>
+        <td style="vertical-align: top;">Code:<input name="icmp_code" type="text"></td>
+      </tr>
+      <tr>
+        <td colspan="1" rowspan="2" style="vertical-align: top;"><br>
+Common arguments for icmp echo, mask, timestamp packet<br>
         </td>
+        <td style="vertical-align: top;">ID:<input name="icmp_id" type="text"></td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">seq Number:<input name="icmp_seq" type="text"></td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">Only for icmp mask<br>
+        </td>
+        <td style="vertical-align: top;">Subnet mask:<input name="icmp_submask" type="text"></td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">Only for icmp redirect<br>
+        </td>
+        <td style="vertical-align: top;">Gateway:<input name="icmp_gateway" type="text"></td>
+      </tr>
+      <tr>
+        <td colspan="1" rowspan="3" style="vertical-align: top;"><br>
+Only for icmp time stamp<br>
+        </td>
+        <td style="vertical-align: top;">Originate Time Stamp:<input name="icmp_ots" type="text"></td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">Receive Time Stamp:<input name="icmp_rts" type="text"></td>
+      </tr>
+      <tr>
+        <td style="vertical-align: top;">Transmit Time Stamp:<input name="icmp_tts" type="text"></td>
       </tr>
     </tbody>
   </table>
-  <br>
   <br>
 Payload: <textarea name="payload" cols="50" rows="3"></textarea><br>
   <input value="Submit" type="submit"></form>

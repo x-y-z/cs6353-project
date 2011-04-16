@@ -218,7 +218,10 @@ void replyReq(char *rData, char *sData)
                         aComm.ttl
                         );
                 aTcpS.setPayload(payload, len);
-                aTcpS.sendPacket();
+                if (aTcpS.sendPacket() == 0)
+                    strcpy(sData, "Packet sending succeeded!");
+                else
+                    strcpy(sData, "Packet sending failed!");
             }
             break;
         case UDP_T:
@@ -233,7 +236,10 @@ void replyReq(char *rData, char *sData)
                          aComm.dst_prtb,
                          aComm.dst_prte);
                 aUdpS.setPayload(payload, len);
-                aUdpS.sendPacket();
+                if (aUdpS.sendPacket() == 0)
+                    strcpy(sData, "Packet sending succeeded!");
+                else
+                    strcpy(sData, "Packet sending failed!");
             }
             break;
         case ICMP_T:

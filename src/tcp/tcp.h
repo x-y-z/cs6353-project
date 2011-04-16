@@ -23,7 +23,7 @@ using std::cout;
 	ptag 	protocol tag to modify an existing header, 0 to build a new one 
 */
 
-typedef struct argList{
+typedef struct argList_t{
 		u_int16_t  	sp;   //source port
 		u_int16_t  	dpbegin;
                 u_int16_t  	dpend;   //destination port
@@ -40,7 +40,7 @@ typedef struct argList{
                 u_long   daddr;
                 u_int ttl;            /* time to live*/
                 u_int frag;           /* framentation bit*/
-} argList;
+} argList_t;
 
 class tcp
 {
@@ -55,7 +55,7 @@ private:
     u_char *ip_opt;
     int opt_len;
 
-    argList packetArgs;
+    argList_t packetArgs;
     u_short cport;   /* current dst port*/
 
     u_int ifInitPayload;
@@ -113,9 +113,7 @@ public:
 		u_int32_t  	ack,     // ack number
 		u_int8_t  	control,   // control
 		u_int16_t  	win,   //   winsize
-		u_int16_t  	sum,   // check sum  0
 		u_int16_t  	urg,     // pointer  0
-		u_int16_t  	len,     // lens of the packet
                 char*   saddr,
                 char*   daddr,
                 u_int frag,

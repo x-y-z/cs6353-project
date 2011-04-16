@@ -1,22 +1,249 @@
 #include <iostream>
 #include "parser.h"
+#include <unistd.h>
+#include <cstdlib>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <pthread.h>
+#include "../udp/udp.h"
+#include "../tcp/tcp.h"
+
+using std::cerr;
+using std::endl;
+
+#define DEFAULT_PRT 3333
+#define BUFFER_SZ   10240
+
+int error(const char *msg)
+{
+   cerr<<msg<<endl;
+   exit(1);
+}
+
+void *runClient(void *param);
+void replyReq(char *rData, char *sData);
+int getIndex(char **buffer);
 
 int main(int argc, char **argv)
 {
+    int listenSock, accSock;
+    struct sockaddr_in serveraddr;
+    struct sockaddr_in clientaddr;
+    int clntlen;
+    int h_port;
+    
+    //check arugments
+    if (argc != 2)
+    {
+        h_port = DEFAULT_PRT;
+    }
+
+    //construct a socket
+    listenSock = socket(AF_INET, SOCK_STREAM, 0);
+    if (listenSock < 0)
+        error("ERROR: cannot open socket\n");
+
+    //set socket option
+    int optval = 1;
+    setsockopt(listenSock, SOL_SOCKET, SO_REUSEADDR,
+               (const void *)&optval, sizeof(int));
+
+    bzero((char *)&serveraddr, sizeof(serveraddr));
+
+    serveraddr.sin_family = AF_INET;
+
+    serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serveraddr.sin_port = htons((unsigned short) h_port);
+
+    //binding address with socket
+    if (bind(listenSock, (struct sockaddr *)&serveraddr,
+                sizeof(serveraddr)) < 0)
+        error("ERROR: binding error\n");
+
+    //listen to hotel port
+    if (listen(listenSock, 5) < 0)
+        error("ERROR: listen error\n");
+        
+	clntlen = sizeof(clientaddr);
+
+    while(1)
+    {
+        //accept new client
+        accSock = accept(listenSock, 
+                         (struct sockaddr *)&clientaddr, 
+                         (socklen_t*)&clntlen);
+        if (accSock < 0)
+            error("ERROR: accept error\n");
+
+        //send a new client to a thread
+        pthread_t tid;
+        pthread_create(&tid, NULL, runClient, (void *)&accSock);
+    }
+    return 0;
+
+}
+
+
+void *runClient(void *data)
+{
+    int clntSock;
+    char buf[BUFFER_SZ];
+    int readNum;
+    int state = 0;
+
+    memcpy(&clntSock, data, sizeof(clntSock));
+
+    while (state != 2)
+    {
+        //read msg sent from the browser
+        readNum = recv(clntSock, buf, BUFFER_SZ, 0);
+        if (readNum < 0)
+            error("ERROR: reading from socket error\n");
+
+
+        fprintf(stderr,"LOG:Get msg: size:%d\n%s\n", readNum, buf);
+
+        //GET method process
+        if (strncmp(buf, "GET", 3) == 0)
+        {
+            char *fileBuf = NULL;
+
+            int fileLen = getIndex(&fileBuf);
+
+
+            int sendNum;
+
+            sendNum = send(clntSock, fileBuf, fileLen, 0);
+            if (sendNum < fileLen)
+            {
+                error("ERROR: sending file error\n");
+            }
+
+            if (fileBuf != NULL)
+            {
+                free(fileBuf);
+                fileBuf = NULL;
+            }
+
+            state = 2;
+
+        }
+               //POST method process
+        else if (strncmp(buf, "POST", 4) == 0)
+        {
+
+            char replyBuf[1024];
+            replyReq(buf, replyBuf);
+            fprintf(stderr, "LOG:Send msg:%s\n", replyBuf);
+            send(clntSock, replyBuf, strlen(replyBuf), 0);
+
+            state = 2;
+        }
+        else
+        {
+            error("ERROR: undefined operation\n");
+        }
+    }
+
+    fprintf(stderr, "LOG:Finished\n");
+    fprintf(stderr, "******************\n");
+    close(clntSock);
+}
+
+int getIndex(char **buffer)
+{
+    FILE *index;
+    long file_sz;
+
+    index = fopen("index.html", "r");
+    if (index == NULL)
+        error("ERROR: index.html not found\n");
+
+    fseek(index, 0, SEEK_END);
+    file_sz = ftell(index);
+
+    *buffer = (char *)malloc(file_sz);
+    if (*buffer == NULL)
+        error("ERROR: out of mem\n");
+
+    rewind(index);
+
+    int len = fread(*buffer, 1, file_sz, index);
+    if (len != file_sz)
+        error("ERROR: file reading error\n");
+
+    fclose(index);
+
+    return file_sz;
+}
+
+
+void replyReq(char *rData, char *sData)
+{
     parser aParser;
-    string tmp("type=tcp&srcip=192.168.0.1&srcprt=1123&dstip=126.124.145.111&dstprtb=45&dstprte=56&frag=0&ttl=62&tcp_seqnum=12&tcp_acknum=23&tcp_winsz=123&tcp_urgptr=123&tcp_ctrlflag=tcp_urg&tcp_ctrlflag=tcp_psh&tcp_ctrlflag=tcp_rst&tcp_ctrlflag=tcp_syn&tcp_ctrlflag=tcp_fin&icmp_type=12&icmp_code=12&icmp_id=22&icmp_seq=22&icmp_submask=22&icmp_gateway=22&icmp_ots=22&icmp_rts=22&icmp_tts=22&payload=hello+world");
-    comArg_t a;
-    tcpArg_t b;
-    icmpArg_t c;
-    char payload[500];
+    string iData(rData);
+    comArg_t aComm;
+    tcpArg_t aTcp;
+    icmpArg_t aIcmp;
+    char payload[1500];
     int len;
 
-    aParser.getInput(tmp);
-    a = aParser.getCommonArg();
-    b = aParser.getTcpArg();
-    c = aParser.getIcmpArg();
-    aParser.getPayload(payload, len);
+    aParser.getInput(iData);
 
-    return 0;
+    aComm = aParser.getCommonArg();
+    aTcp = aParser.getTcpArg();
+    aIcmp = aParser.getIcmpArg();
+    aParser.getPayload(payload, len);
+    
+    switch (aComm.packet_t)
+    {
+        case TCP_T:
+            {
+                tcp aTcpS;
+                aTcpS.setArgs(
+                        aComm.src_prt,
+                        aComm.dst_prtb,
+                        aComm.dst_prte,
+                        aTcp.seq,
+                        aTcp.ack,
+                        aTcp.control,
+                        aTcp.win,
+                        aTcp.urg,
+                        aComm.src_ip,
+                        aComm.dst_ip,
+                        aComm.frag,
+                        aComm.ttl
+                        );
+                aTcpS.setPayload(payload, len);
+                aTcpS.sendPacket();
+            }
+            break;
+        case UDP_T:
+            {
+                udp aUdpS;
+                aUdpS.setArgs(
+                         aComm.frag, 
+                         aComm.ttl, 
+                         aComm.src_ip, 
+                         aComm.dst_ip,
+                         aComm.src_prt,
+                         aComm.dst_prtb,
+                         aComm.dst_prte);
+                aUdpS.setPayload(payload, len);
+                aUdpS.sendPacket();
+            }
+            break;
+        case ICMP_T:
+            {
+               //icmp aIcmpS; 
+            }
+            break;
+        default:
+            break;
+    }
+
 
 }

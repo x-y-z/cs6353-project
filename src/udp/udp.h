@@ -8,7 +8,7 @@ using std::cout;
 
 #define MAX_PAYLOAD_SZ  1500
 
-typedef struct argList{
+typedef struct argList_u{
     int payload_size;                   /* payload size*/
     u_long src_ip, dst_ip;              /* source ip, dest ip*/
     u_short src_port;                   /* source port*/
@@ -18,7 +18,7 @@ typedef struct argList{
     u_int frag;                         /* framentation bit*/
 
 
-} argList;
+} argList_u;
 
 class udp
 {
@@ -32,7 +32,7 @@ private:
     u_char *ip_opt;
     int opt_len;
 
-    argList packetArgs;
+    argList_u packetArgs;
     u_short cport;                      /* current dst port*/
 
     u_int ifInitPayload;

@@ -10,6 +10,7 @@
 #include <pthread.h>
 #include "../udp/udp.h"
 #include "../tcp/tcp.h"
+#include "../icmp/icmp.h"
 
 using std::cerr;
 using std::endl;
@@ -244,7 +245,29 @@ void replyReq(char *rData, char *sData)
             break;
         case ICMP_T:
             {
-               //icmp aIcmpS; 
+               icmp aIcmpS; 
+               aIcmpS.setArgs(
+                         aComm.frag,
+                         aComm.ttl,
+                         aComm.src_ip,
+                         aComm.dst_ip,
+                         aComm.src_prt,
+                         aComm.dst_prtb,
+                         aComm.dst_prte,
+                         aIcmp.type,
+                         aIcmp.code,
+                         aIcmp.id,
+                         aIcmp.seq,
+                         aIcmp.mask,
+                         aIcmp.gateway,
+                         aIcmp.otime,
+                         aIcmp.rtime,
+                         aIcmp.ttime);
+                aIcmpS.setPayload(payload, len);
+                if (aIcmpS.sendPacket() == 0)
+                    strcpy(sData, "Packet sending succeeded!");
+                else
+                    strcpy(sData, "Packet sending failed!");
             }
             break;
         default:

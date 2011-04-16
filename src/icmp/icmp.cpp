@@ -86,7 +86,7 @@ int icmp::packetConstrICMP_Echo()
 			0,		          /*checksum = 0 for libnet auto fill*/
 			packetArgs.id,
 			packetArgs.seq,
-			payload,
+			(uint8_t *)payload,
 			packetArgs.payload_size,
 			network,
 			icmp_t);	
@@ -102,7 +102,7 @@ int icmp::packetConstrICMP_Mask()
 			packetArgs.id,
 			packetArgs.seq,
 			packetArgs.mask,	 /*subnet mask*/
-			payload,
+			(uint8_t *)payload,
 			packetArgs.payload_size,
 			network,
 			icmp_t);	
@@ -116,7 +116,7 @@ int icmp::packetConstrICMP_Redirect()
 			packetArgs.code,	 /*code should be one of 4*/
 			0,		         /*checksum = 0 for libnet auto fill*/
 			packetArgs.gateway,
-			payload,
+			(uint8_t *)payload,
 			packetArgs.payload_size,
 			network,
 			icmp_t);	
@@ -129,7 +129,7 @@ int icmp::packetConstrICMP_TimeExceed()
 			packetArgs.type,
 			packetArgs.code,	/*code should be one of 2*/
 			0,		/*checksum = 0 for libnet auto fill*/
-			payload,
+			(uint8_t *)payload,
 			packetArgs.payload_size,
 			network,
 			icmp_t);	
@@ -147,7 +147,7 @@ int icmp::packetConstrICMP_TimeStamp()
 			packetArgs.otime,
 			packetArgs.rtime,
 			packetArgs.ttime,
-			payload,
+			(uint8_t *)payload,
 			packetArgs.payload_size,
 			network,
 			icmp_t);	
@@ -159,7 +159,7 @@ int icmp::packetConstrICMP_Unreach()
 			packetArgs.type,
 			packetArgs.code,	/*code should be one of 16*/
 			0,		     /*checksum = 0 for libnet auto fill*/
-			payload,
+			(uint8_t *)payload,
 			packetArgs.payload_size,
 			network,
 			icmp_t);	

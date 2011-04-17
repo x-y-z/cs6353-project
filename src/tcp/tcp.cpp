@@ -7,7 +7,7 @@ using std::endl;
 
 int tcp::sendPacket()
 {
-    int ret;
+    int ret = 0;
     u_short bport;
     u_short eport;
 
@@ -19,14 +19,18 @@ int tcp::sendPacket()
     
     for (cport = bport; cport <= eport; cport++)
     {
-        ret = packetConstrTCP(); //step 2
-        ret = packetConstrIP();  //step 3
-        ret = packetInject();    //step 4
-        cout<<"packet injected!\n";
+        ret += packetConstrTCP(); //step 2
+        if (ret != 0)
+            break;
+        ret += packetConstrIP();  //step 3
+        if (ret != 0)
+            break;
+        ret += packetInject();    //step 4
+        if (ret != 0)
+            break;
     }
-    memoryDeinit(); //step 5
 
-    return 0;
+    return ret;
 }
 
 int tcp::networkInit() //step 1

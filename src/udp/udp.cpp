@@ -6,7 +6,7 @@ using std::endl;
 
 int udp::sendPacket()
 {
-    int ret;
+    int ret = 0;
     u_short bport;
     u_short  eport;
 
@@ -16,16 +16,20 @@ int udp::sendPacket()
     if (ifInitPayload == 0 || ifInitArgs == 0)
         return -1;
 
-    
     for (cport = bport; cport <= eport; cport++)
     {
-        ret = packetConstrUDP(); //step 2
-        ret = packetConstrIP();  //step 3
-        ret = packetInject();    //step 4
+        ret += packetConstrUDP(); //step 2
+        if (ret != 0)
+            break;
+        ret += packetConstrIP();  //step 3
+        if (ret != 0)
+            break;
+        ret += packetInject();    //step 4
+        if (ret != 0)
+            break;
     }
-    memoryDeinit();    //step 5
 
-    return 0;
+    return ret;
 }
 
 int udp::networkInit()     //step 1

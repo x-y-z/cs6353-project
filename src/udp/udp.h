@@ -51,6 +51,8 @@ public:
     { 
         if (ip_opt != NULL) 
             delete []ip_opt;
+
+        memoryDeinit();
     };
 
 public:

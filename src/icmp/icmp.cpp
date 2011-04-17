@@ -6,25 +6,29 @@ using std::endl;
 
 int icmp::sendPacket()
 {
-    int ret;
+    int ret = 0;
     u_short bport;
     u_short  eport;
     bport = packetArgs.dst_bport;
     eport = packetArgs.dst_eport;
     if (ifInitPayload == 0 || ifInitArgs == 0)
         return -1;
-    networkInit();     //step 1
   //  cout<<"here\n";
     for (cport = bport; cport <= eport; cport++)
     {
-        ret=packetConstrICMP(); //step 2
+        ret += packetConstrICMP(); //step 2
+        if (ret != 0)
+            break;
       //  cout<<"here\n";
-        ret=packetConstrIP();  //step 3
+        ret += packetConstrIP();  //step 3
+        if (ret != 0)
+            break;
        // cout<<"here\n";
-        ret=packetInject();    //step 4
+        ret += packetInject();    //step 4
+        if (ret != 0)
+            break;
     }
-    memoryDeinit();    //step 5
-    return 0;
+    return ret;
 }
 
 int icmp::networkInit()     //step 1

@@ -54,11 +54,15 @@ private:
     libnet_ptag_t ip_t;
 
 public:
-    icmp():ip_opt(NULL), ifInitPayload(0), ifInitArgs(0),icmp_t(0),ipo_t(0),ip_t(0){};
+    icmp():ip_opt(NULL), ifInitPayload(0), ifInitArgs(0),icmp_t(0),ipo_t(0),ip_t(0)
+    {
+        networkInit();     //step 1
+    };
     ~icmp()
     { 
         if (ip_opt != NULL) 
             delete []ip_opt;
+        memoryDeinit();    //step 5
     };
 
 public:

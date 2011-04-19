@@ -26,7 +26,7 @@ using std::cout;
 typedef struct argList_t{
 		u_int16_t  	sp;   //source port
 		u_int16_t  	dpbegin;
-                u_int16_t  	dpend;   //destination port
+        u_int16_t  	dpend;   //destination port
 		u_int32_t  	seq;    // sequence number
 		u_int32_t  	ack;     // ack number
 		u_int8_t  	control;   // control
@@ -36,10 +36,10 @@ typedef struct argList_t{
 		u_int16_t  	len;     // lens of the packet
 		u_int8_t *  	payload;   // payload
 		u_int32_t  	payload_s;   // lens of payload
-                u_long   saddr;
-                u_long   daddr;
-                u_int ttl;            /* time to live*/
-                u_int frag;           /* framentation bit*/
+        u_long   saddr;
+        u_long   daddr;
+        u_int ttl;            /* time to live*/
+        u_int frag;           /* framentation bit*/
 } argList_t;
 
 class tcp
@@ -108,18 +108,18 @@ public:
         return 0;
     }
     void setArgs(
-                u_int16_t  	sp,     //source port
+        u_int16_t  	sp,     //source port
 		u_int16_t  	dpbegin,
-                u_int16_t  	dpend,   //destination port
+        u_int16_t  	dpend,   //destination port
 		u_int32_t  	seq,    // sequence number
 		u_int32_t  	ack,     // ack number
 		u_int8_t  	control,   // control
 		u_int16_t  	win,   //   winsize
 		u_int16_t  	urg,     // pointer  0
-                char*   saddr,
-                char*   daddr,
-                u_int frag,
-                u_int ttltime)
+        char*   saddr,
+        char*   daddr,
+        u_int frag,
+        u_int ttltime)
     {
           setDstPort(dpbegin,dpend) ;
           setWinSize(win);
@@ -131,6 +131,7 @@ public:
           setSrcIP(saddr);
           setDstIP(daddr);
           setFragmentation(frag);
+          setLengh();
           setTTL(ttltime);
           ifInitArgs = 1;
     };
@@ -173,7 +174,7 @@ private:
    void setAck(u_int32_t acknumber){packetArgs.ack=acknumber;};
    void setControl(u_int8_t con){packetArgs.control=con;};
    void setUrgent(u_int16_t urgent){packetArgs.urg=urgent;};
-   void setLengh(u_int16_t len){packetArgs.len=LIBNET_TCP_H; };
+   void setLengh(){packetArgs.len=LIBNET_TCP_H; };
 
     
 

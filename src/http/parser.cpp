@@ -129,7 +129,7 @@ int parser::getInput(const string content)
                 break;
             case 12://tcp_ctrlflag
                 start = 0;
-                tcpArg.control = TH_ACK;
+                tcpArg.control = 0;
                 while ((start = content.find(argNames[i], start)) != -1)
                 {
                     start = start + strlen(argNames[i]) + 1;
@@ -139,6 +139,8 @@ int parser::getInput(const string content)
 
                     if (res.compare("tcp_urg") == 0)
                         tcpArg.control = tcpArg.control | TH_URG;
+                    else if (res.compare("tcp_ack") == 0)
+                        tcpArg.control = tcpArg.control | TH_ACK;
                     else if (res.compare("tcp_psh") == 0)
                         tcpArg.control = tcpArg.control | TH_PUSH;
                     else if (res.compare("tcp_rst") == 0)

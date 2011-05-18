@@ -1,0 +1,7 @@
+*How to compile: go to http folder, then make.
+
+*How to run the program: after compilation, run sudo ./httpd <port number> 
+in http folder.
+
+*How to send packets: open a browser, go to localhost:3333, if you did not 
+specify port number when you run the program.
